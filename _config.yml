@@ -1,0 +1,11 @@
+title: kielsucks
+description: >-
+  Beer, maker projects, software, and the occasional word about parenting with ADHD.
+url: "https://kielsucks.github.io"
+permalink: /:year/:month/:day/:title/
+markdown: kramdown
+plugins:
+  - jekyll-feed
+exclude:
+  - docs/
+  - vendor/
