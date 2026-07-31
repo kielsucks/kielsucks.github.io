@@ -10,7 +10,8 @@
 
 ## Global Constraints
 
-- Repo: `kielsucks/kielsucks.github.io`, local clone at `~/code/kielsucks.github.io`, work happens on `main` (GitHub Pages serves `main` directly — no separate `gh-pages` branch).
+- Repo: `kielsucks/kielsucks.github.io`, local clone at `~/code/kielsucks.github.io`, work happens on `main` (GitHub Pages serves `main` directly — no separate `gh-pages` branch). Implementation happens in the git worktree at `/Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog` (branch `worktree-personal-blog`) — every `Run:` command below executes there, and merges back to `main` at the end.
+- Environment: this machine's system Ruby (2.6, at `/usr/bin/ruby`) is too old for the current `github-pages` gem (its `nokogiri` dependency needs Ruby >= 3.0). Use the Homebrew Ruby installed at `/opt/homebrew/opt/ruby/bin` instead — prefix every `bundle`/`jekyll` command with `export PATH="/opt/homebrew/opt/ruby/bin:$PATH"` (or run it in the same shell invocation). The classic `source "https://pages.github.com/"` Gemfile source is dead (404s) — use `source "https://rubygems.org"` instead.
 - Build must work with GitHub Pages' native Jekyll build (`github-pages` gem) — no plugins outside its whitelist. Tag pages use plain Liquid loops over `site.tags`, never `jekyll-archives`.
 - Posts live in `_posts/` named `YYYY-MM-DD-title.md`; date comes from the filename, not a front-matter `date:` field.
 - Site structure is a single tagged feed (home page = all posts reverse-chron) plus a `/tags.html` grouping page — no separate top-level section pages per topic.
@@ -33,7 +34,7 @@
 - [ ] **Step 1: Write the Gemfile**
 
 ```ruby
-source "https://pages.github.com/"
+source "https://rubygems.org"
 
 gem "github-pages", group: :jekyll_plugins
 ```
@@ -64,12 +65,12 @@ vendor/
 
 - [ ] **Step 4: Install dependencies**
 
-Run: `cd ~/code/kielsucks.github.io && bundle install`
-Expected: gems resolve and install cleanly. If you see `bundler: command not found`, run `gem install bundler` first, then retry.
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle config set path 'vendor/bundle' && bundle install`
+Expected: gems resolve and install cleanly (~90 gems, takes a minute).
 
 - [ ] **Step 5: Verify the build works**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, creates a `_site/` directory, and `_site/index.html` exists containing the untouched placeholder text `Welcome to this world` (no layout applied yet since the existing `index.html` has no front matter).
 
 - [ ] **Step 6: Commit**
@@ -241,7 +242,7 @@ article.post .post-title { font-size: 1.6rem; }
 
 - [ ] **Step 5: Build and verify the stylesheet compiles**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, and `_site/assets/css/style.css` exists and contains the string `--accent: #e8541e`.
 
 Run: `grep -c '^---$' _site/assets/css/style.css`
@@ -298,7 +299,7 @@ This is the first post on what's going to be a running log of the stuff I actual
 
 - [ ] **Step 3: Build and verify the post page renders**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, and `_site/2026/07/31/welcome/index.html` exists.
 
 Run: `grep -E "Welcome|2026.07.31|software" _site/2026/07/31/welcome/index.html`
@@ -343,7 +344,7 @@ title: Home
 
 - [ ] **Step 2: Build and verify the feed lists the post**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0.
 
 Run: `grep -c "post-card" _site/index.html`
@@ -395,7 +396,7 @@ permalink: /tags.html
 
 - [ ] **Step 2: Build and verify tag grouping**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, `_site/tags.html` exists.
 
 Run: `grep -E "software|welcome" _site/tags.html`
@@ -432,7 +433,7 @@ I'm Kiel — security engineer by day, and this is where I write about the stuff
 
 - [ ] **Step 2: Build and verify**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, `_site/about.html` exists.
 
 Run: `grep "security engineer" _site/about.html`
@@ -496,7 +497,7 @@ Noise-canceling headphones for me, not the kids — that was the surprising part
 
 - [ ] **Step 4: Build and verify all four posts show up**
 
-Run: `cd ~/code/kielsucks.github.io && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0.
 
 Run: `grep -c "post-card" _site/index.html`
@@ -524,7 +525,7 @@ git commit -m "Seed starter posts for beer, maker, and adhd-parenting tags"
 
 - [ ] **Step 1: Push to GitHub**
 
-Run: `cd ~/code/kielsucks.github.io && git push origin main`
+Run: from `/Users/kiel/code/kielsucks.github.io` (the original clone, not the worktree): merge the `worktree-personal-blog` branch into `main` via superpowers:finishing-a-development-branch, then `git push origin main`
 Expected: pushes cleanly (no conflicts — the repo only had the placeholder before Task 1).
 
 - [ ] **Step 2: Confirm the Pages build succeeded**
