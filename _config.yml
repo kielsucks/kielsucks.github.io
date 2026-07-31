@@ -9,3 +9,9 @@ plugins:
 exclude:
   - docs/
   - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - .sass-cache/
+  - .jekyll-cache/
+  - .jekyll-metadata
+  - .bundle/
