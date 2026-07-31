@@ -1,1 +1,15 @@
-Welcome to this world
+---
+layout: default
+title: Home
+---
+<ul class="post-list">
+  {% for post in site.posts %}
+  <li class="post-card">
+    <p class="post-meta">
+      <span>{{ post.date | date: '%Y.%m.%d' }}</span>
+      {% for tag in post.tags %}<span>{{ tag }}</span>{% endfor %}
+    </p>
+    <h2 class="post-title"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+  </li>
+  {% endfor %}
+</ul>
