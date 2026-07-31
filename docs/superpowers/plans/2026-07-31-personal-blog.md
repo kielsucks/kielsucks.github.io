@@ -11,7 +11,8 @@
 ## Global Constraints
 
 - Repo: `kielsucks/kielsucks.github.io`, local clone at `~/code/kielsucks.github.io`, work happens on `main` (GitHub Pages serves `main` directly — no separate `gh-pages` branch). Implementation happens in the git worktree at `/Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog` (branch `worktree-personal-blog`) — every `Run:` command below executes there, and merges back to `main` at the end.
-- Environment: this machine's system Ruby (2.6, at `/usr/bin/ruby`) is too old for the current `github-pages` gem (its `nokogiri` dependency needs Ruby >= 3.0). Use the Homebrew Ruby installed at `/opt/homebrew/opt/ruby/bin` instead — prefix every `bundle`/`jekyll` command with `export PATH="/opt/homebrew/opt/ruby/bin:$PATH"` (or run it in the same shell invocation). The classic `source "https://pages.github.com/"` Gemfile source is dead (404s) — use `source "https://rubygems.org"` instead.
+- Environment: this machine's system Ruby (2.6, at `/usr/bin/ruby`) is too old for the current `github-pages` gem (its `nokogiri` dependency needs Ruby >= 3.0), and plain Homebrew `ruby` (4.0) is too new (missing stdlib gems the pinned Jekyll 3.9/3.10 expects). Use Homebrew's `ruby@3.2` instead — prefix every `bundle`/`jekyll` command with `export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH"` (or run it in the same shell invocation). The classic `source "https://pages.github.com/"` Gemfile source is dead (404s) — use `source "https://rubygems.org"` instead.
+- Jekyll renders every markdown/HTML file through Liquid by default, front matter or not. This repo's own `docs/superpowers/` plan and spec files contain literal `{% include %}`/Liquid code examples in fenced code blocks — without excluding them, Jekyll tries to actually execute that example code and the build fails. `_config.yml` must set `exclude: [docs/, vendor/]`.
 - Build must work with GitHub Pages' native Jekyll build (`github-pages` gem) — no plugins outside its whitelist. Tag pages use plain Liquid loops over `site.tags`, never `jekyll-archives`.
 - Posts live in `_posts/` named `YYYY-MM-DD-title.md`; date comes from the filename, not a front-matter `date:` field.
 - Site structure is a single tagged feed (home page = all posts reverse-chron) plus a `/tags.html` grouping page — no separate top-level section pages per topic.
@@ -50,6 +51,15 @@ permalink: /:year/:month/:day/:title/
 markdown: kramdown
 plugins:
   - jekyll-feed
+exclude:
+  - docs/
+  - vendor/
+  - Gemfile
+  - Gemfile.lock
+  - .sass-cache/
+  - .jekyll-cache/
+  - .jekyll-metadata
+  - .bundle/
 ```
 
 - [ ] **Step 3: Write `.gitignore`**
@@ -65,12 +75,12 @@ vendor/
 
 - [ ] **Step 4: Install dependencies**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle config set path 'vendor/bundle' && bundle install`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle config set path 'vendor/bundle' && bundle install`
 Expected: gems resolve and install cleanly (~90 gems, takes a minute).
 
 - [ ] **Step 5: Verify the build works**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, creates a `_site/` directory, and `_site/index.html` exists containing the untouched placeholder text `Welcome to this world` (no layout applied yet since the existing `index.html` has no front matter).
 
 - [ ] **Step 6: Commit**
@@ -242,7 +252,7 @@ article.post .post-title { font-size: 1.6rem; }
 
 - [ ] **Step 5: Build and verify the stylesheet compiles**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, and `_site/assets/css/style.css` exists and contains the string `--accent: #e8541e`.
 
 Run: `grep -c '^---$' _site/assets/css/style.css`
@@ -299,7 +309,7 @@ This is the first post on what's going to be a running log of the stuff I actual
 
 - [ ] **Step 3: Build and verify the post page renders**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, and `_site/2026/07/31/welcome/index.html` exists.
 
 Run: `grep -E "Welcome|2026.07.31|software" _site/2026/07/31/welcome/index.html`
@@ -344,7 +354,7 @@ title: Home
 
 - [ ] **Step 2: Build and verify the feed lists the post**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0.
 
 Run: `grep -c "post-card" _site/index.html`
@@ -396,7 +406,7 @@ permalink: /tags.html
 
 - [ ] **Step 2: Build and verify tag grouping**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, `_site/tags.html` exists.
 
 Run: `grep -E "software|welcome" _site/tags.html`
@@ -433,7 +443,7 @@ I'm Kiel — security engineer by day, and this is where I write about the stuff
 
 - [ ] **Step 2: Build and verify**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0, `_site/about.html` exists.
 
 Run: `grep "security engineer" _site/about.html`
@@ -497,7 +507,7 @@ Noise-canceling headphones for me, not the kids — that was the surprising part
 
 - [ ] **Step 4: Build and verify all four posts show up**
 
-Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby/bin:$PATH" && bundle exec jekyll build`
+Run: `cd /Users/kiel/code/kielsucks.github.io/.claude/worktrees/personal-blog && export PATH="/opt/homebrew/opt/ruby@3.2/bin:$PATH" && bundle exec jekyll build`
 Expected: exits 0.
 
 Run: `grep -c "post-card" _site/index.html`
