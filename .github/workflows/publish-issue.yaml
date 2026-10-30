@@ -1,0 +1,37 @@
+name: Create Post From Issue
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  create_post:
+    if: contains(github.event.issue.labels.*.name, 'publish')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Generate Post Filename and Content
+        run: |
+          # Format date and slugify title for Jekyll filename
+          TITLE="${{ github.event.issue.title }}"
+          SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/-\{1,\}/-/g')
+          DATE=$(date +%Y-%m-%d)
+          FILENAME="_posts/${DATE}-${SLUG}.md"
+          
+          # Write front matter and body
+          echo "---" > $FILENAME
+          echo "layout: post" >> $FILENAME
+          echo "title: \"$TITLE\"" >> $FILENAME
+          echo "date: ${DATE}" >> $FILENAME
+          echo "---" >> $FILENAME
+          echo "" >> $FILENAME
+          echo "${{ github.event.issue.body }}" >> $FILENAME
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add _posts/*
+          git commit -m "Automated post: ${{ github.event.issue.title }}"
+          git push
